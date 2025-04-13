@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="surface.cpp">
+      <Filter>template code</Filter>
+    </ClCompile>
+    <ClCompile Include="template.cpp">
+      <Filter>template code</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>object code</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>object code</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer.cpp">
+      <Filter>object code</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cpp">
+      <Filter>until</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>until</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics.cpp">
+      <Filter>object code</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>object code</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>until</Filter>
+    </ClCompile>
+    <ClCompile Include="coded_scene.cpp">
+      <Filter>until</Filter>
+    </ClCompile>
+    <ClCompile Include="Myscript.cpp">
+      <Filter>until</Filter>
+    </ClCompile>
+    <ClCompile Include="PongScripts.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="game.h" />
+    <ClInclude Include="surface.h">
+      <Filter>template code</Filter>
+    </ClInclude>
+    <ClInclude Include="template.h">
+      <Filter>template code</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>object code</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>object code</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>object code</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.ixx">
+      <Filter>object code</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>object code</Filter>
+    </ClInclude>
+    <ClInclude Include="MACRO.hpp">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.hpp">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>object code</Filter>
+    </ClInclude>
+    <ClInclude Include="fmt_includes.h">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="coded_scene.h">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="Option.hpp">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="Myscript.h">
+      <Filter>until</Filter>
+    </ClInclude>
+    <ClInclude Include="PongScripts.hpp" />
+    <ClInclude Include="Component.h">
+      <Filter>object code</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="template code">
+      <UniqueIdentifier>{bf32dd6e-4be7-4889-8ac6-49e7ee163c40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object code">
+      <UniqueIdentifier>{e0602153-d0e6-49e3-9091-df88866ad6ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="until">
+      <UniqueIdentifier>{d1e2a8c9-4796-41f2-9410-7c441132e0fb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_readme.txt">
+      <Filter>template code</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
