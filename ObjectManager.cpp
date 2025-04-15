@@ -5,8 +5,11 @@ namespace Core {
 
 	vector<GameObject*> ObjectManager::game_objects;
 	vector<IRenderer*> ObjectManager::render_order;
+
 	vector<GameObject*> ObjectManager::pendingAddGameObjects;
 	vector<GameObject*> ObjectManager::pendingRemoveGameObjects;
+	
+	// keep separate list for security and insurance, correct order of operation and keep all casting code in one class
 	vector<std::pair<GameObject*, IScript*>> ObjectManager::scriptsAdd;
 	vector<IScript*> ObjectManager::scriptsRemove;
 
@@ -19,6 +22,7 @@ namespace Core {
 	vector<std::pair<GameObject*, IAABB*>> ObjectManager::collidersAdd;
 	vector<IAABB*> ObjectManager::collidersRemove;
 
+
 	bool ObjectManager::rebuild_render_list = false, ObjectManager::reorder_renderlist = false;
 
 	void ObjectManager::cleanup()
@@ -29,15 +33,14 @@ namespace Core {
 			}
 			object->isInManiger = false;
 			delete object;
-			
 		}
-		//TODO: delete all things in add vectors
+		//TODO: delete all things in add vectors to prevent memory leaks
 		game_objects.clear();
 	}
 
 	void ObjectManager::ProcessLifecycleQueues()
 	{
-		//remove elements
+		// --- remove elements --- 
 		for (IScript* script : scriptsRemove) {
 			script->gameobject->_removeScript(*script);
 		}
@@ -55,7 +58,7 @@ namespace Core {
 		}
 		collidersRemove.clear();
 
-		//remove gameobjects
+		// --- remove gameobjects --- 
 		for (GameObject* object : pendingRemoveGameObjects) {
 			auto it = std::find(game_objects.begin(), game_objects.end(), object);
 			if (it != game_objects.end()) {
@@ -70,12 +73,12 @@ namespace Core {
 		pendingRemoveGameObjects.clear();
 
 
-		//add gameobjects
+		// --- add gameobjects --- 
 		for (GameObject* object : pendingAddGameObjects) {
 			game_objects.push_back(object);
 			object->isInManiger = true;
 		}
-		//add elemenst
+		// --- add elements --- 
 		for (auto& [object, script] : scriptsAdd) {
 			object->_Direct_AddScript(*script);
 		}
@@ -92,7 +95,7 @@ namespace Core {
 			object->_Direct_AddCollider(*script);
 		}
 		
-		//start scritps
+		// --- start scripts --- 
 		for (GameObject* object : pendingAddGameObjects) {
 			object->StartColliders();
 			object->StartPhysics();
@@ -107,12 +110,6 @@ namespace Core {
 		for (auto& pair : physicsAdd) {
 			pair.second->Start();
 		}
-		/*for (auto& pair : renderersAdd) {
-			pair.second->Start();
-		}
-		for (auto& pair : collidersAdd) {
-			pair.second->Start();
-		}*/
 
 		pendingAddGameObjects.clear();
 		scriptsAdd.clear();
@@ -197,7 +194,7 @@ namespace Core {
 			if(object->isActive()) object->updateScripts();
 		}
 		for (GameObject* object : game_objects) {
-			if (object->isActive())object->updatePhysics();
+			if (object->isActive()) object->updatePhysics();
 		}
 		for (GameObject* object : game_objects) {
 			if (object->isActive()) object->updateTriggers();
@@ -233,7 +230,7 @@ namespace Core {
 					fmt::println("null pointer in AABB list of game object: {}", object->name);
 					continue;
 				}
-				if (collider->staticCollider) continue;
+				if (collider->staticCollider) continue; // only dynamic colliders initiate check
 				for (GameObject* other_object : gameobjects) {
 					if (object == other_object || !other_object->isActive()) continue;
 					for (IAABB* other_collider : other_object->colliders) {

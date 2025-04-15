@@ -18,6 +18,7 @@ Core::Trigger::Trigger(vec2 a_size, vec2 a_ofset, std::string a_id)
 	id = a_id;
 }
 
+// Updates the colided list for tracking if a object stay or exited.
 void Core::Trigger::Update()
 {
 	for (auto it = colided.begin(); it != colided.end(); ) {  
@@ -47,7 +48,8 @@ void Core::Trigger::Update()
 		}
 	}
 }
-
+// overlap isn't a use but a left over from the virtual fiction
+// adds object the collided list
 void Core::Trigger::doCollision(IAABB& other, float overlap_x, float overlap_y)
 {
 	GameObject* object = other.gameobject;
@@ -161,7 +163,7 @@ void Core::Collider::doCollision(IAABB& other, float overlap_x, float overlap_y)
 		// Horizontal collision
 		dir = (other.gameobject->velocity.x > 0) ? ColFunc::ColDir::LEFT :
 			(other.gameobject->velocity.x < 0) ? ColFunc::ColDir::RIGHT :
-			(other.gameobject->pos.x < gameobject->pos.x) ? ColFunc::ColDir::LEFT : ColFunc::ColDir::RIGHT; //TODO misschien pos uit parant function halen en dan de pos van the collider gebruiken in plaats van gameobject
+			(other.gameobject->pos.x < gameobject->pos.x) ? ColFunc::ColDir::LEFT : ColFunc::ColDir::RIGHT;
 		displacement = overlap_x + 1.0f;
 	}
 	else {
@@ -171,6 +173,7 @@ void Core::Collider::doCollision(IAABB& other, float overlap_x, float overlap_y)
 			(other.gameobject->pos.y < gameobject->pos.y)? ColFunc::ColDir::UP: ColFunc::ColDir::DOWN;
 		displacement = overlap_y + 1.0f;
 	}
+	//call custom function
 	behaviour(other, *this ,dir, displacement);
 }
 
@@ -241,7 +244,7 @@ void Core::ColFunc::PongPadleCollision(IAABB& other, IAABB& static_collider, Col
 	if (info) {
 		auto& x = info.unwrap();
 
-		canbounceback = x.last_hit != static_collider.gameobject;
+		canbounceback = x.last_hit != static_collider.gameobject; // if the ball hits the same object twice it won't do collision again
 		x.last_hit = static_collider.gameobject;
 	}
 	if (canbounceback) {
@@ -258,26 +261,28 @@ void Core::ColFunc::PongPadleCollision(IAABB& other, IAABB& static_collider, Col
 		case LEFT:
 			other.gameobject->pos.x -= displasment;
 			{
-				vec2 temp = { -1,(other.gameobject->pos.y + other.ofset.y - (static_collider.gameobject->pos.y + static_collider.ofset.y)) / ((static_collider.size.y * 0.95f) / 2.0f) };
+				float delta = other.gameobject->pos.y + other.ofset.y - (static_collider.gameobject->pos.y + static_collider.ofset.y);
+				float half_pedle_hight = ((static_collider.size.y * 0.95f) / 2.0f);  // the 0.95 is for steeper bounces 
+				vec2 temp = { -1,delta / half_pedle_hight };
 				temp.normalize();
-				temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::PongController::max_ball_speed);
+				temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::PongController::max_ball_speed); // ball speed increases with 5% every touch
 				other.gameobject->velocity = temp;
 			}
 			break;
 		case RIGHT:
 			other.gameobject->pos.x += displasment;
 			{
-				vec2 temp = { 1,(other.gameobject->pos.y + other.ofset.y - (static_collider.gameobject->pos.y + static_collider.ofset.y)) / ((static_collider.size.y * 0.95f) / 2.0f) };
+				float delta = other.gameobject->pos.y + other.ofset.y - (static_collider.gameobject->pos.y + static_collider.ofset.y);
+				float half_pedle_hight = ((static_collider.size.y * 0.95f) / 2.0f);  // the 0.95 is for steeper bounces 
+				vec2 temp = { 1,delta / half_pedle_hight };
 				temp.normalize();
-				temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::PongController::max_ball_speed);
+				temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::PongController::max_ball_speed); // ball speed increases with 5% every touch
 				other.gameobject->velocity = temp;
 			}
 			break;
 
 		}
 	}
-
- // TODO multipol bounces so direction gest revested multipol times;
 }
 
 #ifdef _DEBUG
@@ -286,6 +291,5 @@ void Core::IAABB::draw_outline(Tmpl8::Surface& screen)
 	float x = gameobject->pos.x + ofset.x, y = gameobject->pos.y + ofset.y;
 	screen.Box(static_cast<int>(x - size.x / 2), static_cast<int>(y - size.y / 2),
 		static_cast<int>(x + size.x / 2), static_cast<int>(y + size.y / 2), Color::RED.ToInt());
-
 }
 #endif

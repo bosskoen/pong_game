@@ -2,7 +2,7 @@
 #include <string>
 #include "renderer.h"
 #include <vector>
-#include "Script.ixx"
+#include "Script.h"
 #include "Physics.h"
 #include "Collider.h"
 #include "Option.hpp"
@@ -17,6 +17,8 @@ namespace Core{
 	class GameObject
 	{
 	private:
+
+		// GameObject owns all attached components
 		std::vector<IRenderer*> renderers;
 		std::vector<IScript*> scripts;
 		std::vector<IPhysics*> physics;
@@ -24,8 +26,17 @@ namespace Core{
 
 		void StopSctipts();
 
-		void updatePhysics();
+		/*
+		Update order (per frame):
+		1. scripts
+		2. physics
+		3. trigger collision state list
+		4. collision resolution (handled by object manager)
+		5. rendering (handled by object manager)
+		*/
+
 		void updateScripts();
+		void updatePhysics();
 		void updateTriggers();
 
 		void _Direct_AddScript(IScript& script);
@@ -47,7 +58,8 @@ namespace Core{
 		bool markedForDelete{ false };
 		bool isInManiger{ false };
 
-		CollidedState ColStat {};
+		CollidedState ColStat {}; // set in collider, check for if on ground
+
 		std::string name{ "Name" };
 		Label label{ Label::nothing };
 		Tmpl8::vec2 velocity{};
@@ -60,13 +72,15 @@ namespace Core{
 		GameObject(const GameObject& other);
 		~GameObject();
 
+		/// <summary>
+		/// makes this object enter the update loop
+		/// </summary>
 		void activate();
+		/// <summary>
+		/// removes object for the update loop
+		/// </summary>
 		void deactivate();
-		bool isActive() const { return is_active; }
-
-		//const std::vector<IScript*>& getScripts() { return scripts; }
-
-		
+		bool isActive() const { return is_active; }		
 
 		/// <summary>
 		/// for initialization, add a component to the game-object but does not start it
@@ -90,20 +104,15 @@ namespace Core{
 		/// </summary>
 		void queueComponentForRemoval(Component& component);
 	
-
-
-
-
 		template<typename T>
-		Util::Option<T&> getCollider(const std::string& cond); // get componetn?
+		Util::Option<T&> getCollider(const std::string& cond); 
 		template<typename T>
 		Util::Option<T&> getScript();
 		template<typename T>
 		Util::Option<T&> getRenderer();
+		//TODO one get component function
 
 
-		//bool operator == (const std::string& compare_name);
-		//bool operator == (const Label& compare_label);
 		bool operator == (const GameObject& compare) {return this == &compare;};
 		bool operator != (const GameObject& compare) { return this != &compare; };
 
@@ -152,79 +161,3 @@ namespace Core{
 }
 
 //TODO order of operations in vectors
-
-/*
-scripts:
-	animation
-	map handling
-	object context
-
-	movment??
-physics:
-	gravatie
-	friction
-
-	bonce physics
-
-colliders:
-	coisions
-	triggers:: do the triggers events run on the same (teleport is my big question)
-renderers:
-	just draw it
-
-how to hadel diferens between pos udate movment and velocity update movment
-
-game object:
-	pos
-	name
-	label
-	velocitie
-	[on ground/wall bool]
-
-	sctipts {custom, context, movment, animation}
-	physics { gravatie, friction}
-	coliders { collid, trigger } [ do i need to add difrent behaviors for vel/pos based movment ]
-								{ difrent collistion behaviors coud be set via a fuction ( a bit as a rust closier) that you give with the constructor } or stic with oop and make difernet classes for diferent behaviors
-	renders
-
-update order:
-	scripts:
-		just call update on them { is custom behaviors }
-	physics:
-		update velocitie:
-	ongrount false
-	integrade velocitie
-	colision:
-		{ colission update:
-		iterate over all coliders
-		if it is stationary skip
-		iterate over all other colider
-		skip self colision
-		can colide thruw bit mask
-		does current and other colide if valse skip
-		if current is triger:
-			if other is triger:
-				call event on both trigger
-			if other is colider:
-				call event on trigger
-		if current is colider:
-			if other is trigger:
-				call trigger event
-			if other is colider:
-				if other is moving:
-					moving colision(current other)
-				if other is stationary:
-					stationary colision(current other)
-					}
-		stationary colision(current { moving }, other { stationary} ):
-			other.custom_collide_behavior(current) { could be rigedbody or a trampoline }
-			set on groud bool
-
-		moving collision(current, other)
-			if(current is dominat){
-			current.custom_collide_behavior(other)
-			} else{
-			other.custom_collide_behavior(current)
-			}
-	render new frame
-*/

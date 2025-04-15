@@ -1,0 +1,9 @@
+/Debug/
+/Release/
+
+/.vs/
+
+/tmpl_2019-08_x64.exe
+/tmpl_2019-08_x64.pdb
+/tmpl_2019-08_x64_debug.exe
+/tmpl_2019-08_x64_debug.pdb

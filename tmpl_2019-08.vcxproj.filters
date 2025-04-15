@@ -60,7 +60,7 @@
     <ClInclude Include="Color.h">
       <Filter>until</Filter>
     </ClInclude>
-    <ClInclude Include="Script.ixx">
+    <ClInclude Include="Script.h">
       <Filter>object code</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
