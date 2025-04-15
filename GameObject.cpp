@@ -3,6 +3,7 @@
 #include "ObjectManager.h"
 
 namespace Core {
+	// Move components and reassign their gameobject pointers to this new object
 	GameObject::GameObject(GameObject&& other) noexcept
 	{
 		this->pos = other.pos;
@@ -49,7 +50,8 @@ namespace Core {
 		for (IAABB* collider : colliders) {
 			collider->gameobject = this;
 		}
-	}
+	}// TODO: dosing copy the component in the vector so the pointer share a component so potential for double deletion bug or others
+
 	void GameObject::_Direct_AddRenderer(IRenderer& renderer) {
 		renderer.gameobject = this;
 		renderers.push_back(&renderer);
@@ -269,6 +271,7 @@ namespace Core {
 		pos += velocity * Globals::DeltaTime;
 	}
 
+	// Cleanup all dynamically allocated components and stop scripts
 	GameObject::~GameObject() {
 		StopSctipts();
 		for (IRenderer* renderer : renderers) {

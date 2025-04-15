@@ -10,6 +10,7 @@ namespace Core{
 		static vector<GameObject*> game_objects;
 		static vector<IRenderer*> render_order;
 
+		// keep separate list for security and insurance, correct order of operation and keep all casting code in one class
 		static vector<GameObject*> pendingAddGameObjects;
 		static vector<GameObject*> pendingRemoveGameObjects;
 
@@ -36,21 +37,17 @@ namespace Core{
 		/// only at the end of the program
 		/// </summary>
 		static void cleanup();
-
+		static void clear_scene();
 		static void ProcessLifecycleQueues();
-
-		static void render(Surface& screen);
 
 		/// <summary>
 		/// for normal use, adds a gameObject to the queue to be added. and will call start on it
 		/// </summary>
 		static void queueGameObject(GameObject& new_object);
-
 		/// <summary>
 		/// for constructor, adds a gameObject to the maniger.and will call start on it
 		/// </summary>
 		static void injectGameObject(GameObject& new_object);
-
 		/// <summary>
 		/// for destructor, removes a gameObject from the mangier. and will call stop on it
 		/// </summary>
@@ -60,13 +57,15 @@ namespace Core{
 		/// </summary>
 		static void queueGameObjectForRemoval(GameObject& existing_object);
 
-		static void clear_scene();
+		
 
 		/// <summary>
 		/// calls update on all Game objects managed
 		/// </summary>
 		/// <param name="screen"></param>
 		static void update(Tmpl8::Surface& screen);
+		static void render(Surface& screen);
+
 		static Option<GameObject&> get_gameObject(const std::string& name);
 		static vector<GameObject&> get_gameObject_byLabel(const Label& label);
 
