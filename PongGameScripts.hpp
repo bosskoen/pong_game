@@ -1,54 +1,21 @@
 #pragma once
 #include "ObjectManager.h"
-#include "Myscript.h"
+#include "renderer.h"
 
 #include "Globals.h"
 #include "coded_scene.h"
 
+#include "Collider.h"
+
 
 using namespace Core;
 
+
 namespace Scripts {
 
-	class PongWin : public virtual Core::IScript {
-	private:
-		bool left_won{ false };
-		bool With_AI{ false };
-	public:
-		PongWin(bool a_left_won, bool a_with_AI) : left_won(a_left_won), With_AI(a_with_AI) {}
-
-		void Start() override {
-			string text;
-			if (With_AI) {
-				if(!left_won) {
-					text = "You won!";
-				}
-				else {
-					text = "You lost!";
-				}
-			}
-			else {
-				if (left_won) {
-					text = "Left won!";
-				}
-				else {
-					text = "Right won!";
-				}
-			}
-
-			gameobject->initializeWithComponent(*new Core::TextRenderer({ Globals::screen_width / 2.0f, Globals::screen_height / 4.0f }, text, 50, Color::WHITE, Core::CENTER, Core::UI));
-
-			Button* restart = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) +40 }, "restart", Color::WHITE),
-				* exit = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 120 }, "exit", Color::WHITE);
-			gameobject->injectComponent(*restart);
-			gameobject->injectComponent(*exit);
-			restart->onClick.AddListener(this, [this]() {load_pong_menu(); });
-			exit->onClick.AddListener(this, [this]() {Globals::ExitApp(); });
-		}
-		void Stop() override {}
-		void Update() override {}
-	};
-
+	/// <summary>
+	/// small data class that tracks what the last hit is so power ups can be added properly
+	/// </summary>
 	class BallInfo : public virtual Core::IScript {
 	public:
 		GameObject* last_hit{ nullptr };
@@ -58,6 +25,9 @@ namespace Scripts {
 		void Update() override {}
 	};
 
+	/// <summary>
+	/// a class that lets the player or players control the paddle(s).
+	/// </summary>
 	class PlayerPadleControler :public virtual Core::IScript {
 	private:
 		bool two_palyer{ false }, is_right{ true }, mouce{ true };
@@ -78,19 +48,19 @@ namespace Scripts {
 
 			if (two_palyer) {
 				if (is_right) {
-					int dir = Input::GetKey(Down) - Input::GetKey(Up);
+					int dir = Input::GetKey(Key::Down) - Input::GetKey(Key::Up);
 					gameobject->pos.y += dir * Globals::DeltaTime * speed;
-					//arow
+					//arrow
 				}
 				else {
 					// W/S
-					int dir = Input::GetKey(S) - Input::GetKey(W);
+					int dir = Input::GetKey(Key::S) - Input::GetKey(Key::W);
 					gameobject->pos.y += dir * Globals::DeltaTime * speed;
 				}
 			}
 			else {
 				if (mouce) {
-					// folw mouce
+					// follow mouse
 					float delta = Input::mousePos().y - gameobject->pos.y;
 					float moved = std::copysign(speed, delta) * Globals::DeltaTime;
 					if (fabsf(moved) > fabsf(delta)) {
@@ -102,8 +72,8 @@ namespace Scripts {
 					
 				}
 				else {
-					// aro and w/s
-					int dir = (Input::GetKey(Down) || Input::GetKey(S)) - (Input::GetKey(Up) || Input::GetKey(W));
+					// arrow and w/s
+					int dir = (Input::GetKey(Key::Down) || Input::GetKey(Key::S)) - (Input::GetKey(Key::Up) || Input::GetKey(Key::W));
 					gameobject->pos.y += dir * Globals::DeltaTime * speed;
 				}
 
@@ -112,6 +82,9 @@ namespace Scripts {
 		}
 	};
 
+	/// <summary>
+	/// a mediocre AI for the paddle
+	/// </summary>
 	class PongAI : public virtual Core::IScript {
 	private:
 		GameObject& ball;
@@ -121,8 +94,7 @@ namespace Scripts {
 		float move_to = Globals::screen_height / 2.0f;
 
 		int mis_chance = 0; // chance to miss the ball
-		int style;
-		float idle_timer = 0;
+		int style{ 0 };
 
 		RectRenderer* renderer{ nullptr };
 
@@ -146,7 +118,7 @@ namespace Scripts {
 			case 2: // Medium
 				speed = PlayerPadleControler::default_speed * 0.75f;
 				inacrucy = 20;
-				mis_chance = 5;
+				mis_chance = 25;
 				break;
 			case 3: // Hard
 				speed = PlayerPadleControler::default_speed * 1.05f;
@@ -155,7 +127,7 @@ namespace Scripts {
 			default: // Easy
 				speed = PlayerPadleControler::default_speed * 0.55f;
 				inacrucy = 10;
-				mis_chance = 15;
+				mis_chance = 55;
 				break;
 			}
 			move_to = gameobject->pos.y;
@@ -164,7 +136,6 @@ namespace Scripts {
 
 		void PredictTargetY() {
 			float targetY = vertical_line_vec_intersect(ball.pos, ball.velocity, gameobject->pos.x);
-
 
 			// If the prediction goes off-screen, simulate a bounce
 			while (targetY < 0 || targetY > Globals::screen_height) {
@@ -181,7 +152,7 @@ namespace Scripts {
 				int r = rand() % 100;
 				if (r < mis_chance) {
 					int sign = (r % 2 == 0) ? 1 : -1;
-					offset += sign * (30 + (rand() % 30));
+					offset += sign * (40 + (rand() % 25));
 				}
 			}
 
@@ -199,11 +170,11 @@ namespace Scripts {
 				return;
 			}
 
+			// calculate where to move to
 			if (ball.velocity.x < 0) {
 				//ball is moving to AI
 				if (!moving_to_ai || first_frame) {
 					PredictTargetY();
-
 					moving_to_ai = true;
 					first_frame = false;
 				}
@@ -216,16 +187,12 @@ namespace Scripts {
 					moving_to_ai = false;
 					style = rand() % 3;
 				}
-				idle_timer += Globals::DeltaTime;
 				if (move_to == gameobject->pos.y) {
-					idle_timer = 0.0f;
-
 					switch (difuculty) {
 					case 2: // medium
 						move_to = vertical_line_vec_intersect(ball.pos, ball.velocity, Globals::screen_width - gameobject->pos.x)
 							+ (rand() % 120 - 60);
 						break;
-
 					case 3: // hard
 						switch (style) {
 						case 0: // fakeout
@@ -244,13 +211,12 @@ namespace Scripts {
 						move_to = ball.pos.y + (rand() % 40 - 20);
 						break;
 					}
-
-
 					move_to = std::max((renderer->size.y / 2.0f) + 5.0f, std::min(move_to, Globals::screen_height - ((renderer->size.y / 2.0f) + 5.0f)));
 				}
 				moving_to_ai = false;
 			}
 
+			// make the paddle move to the specified location
 			float direction = move_to < gameobject->pos.y ? -1.0f : 1.0f;
 			float to_move = direction * ((!moving_to_ai && style == 2) ? speed/2.0f : speed) * Globals::DeltaTime;
 			if (fabsf(gameobject->pos.y - move_to) < fabsf(to_move)) {
@@ -264,6 +230,9 @@ namespace Scripts {
 		}
 	};
 
+	/// <summary>
+	/// a class that tracks what power-ups are active in a paddle and changes stats and graphics accordingly
+	/// </summary>
 	class PowerTracker : public virtual Core::IScript {
 	private:
 
@@ -371,6 +340,9 @@ namespace Scripts {
 
 	};
 
+	/// <summary>
+	/// a class that handles the trigger events and animation of a power up
+	/// </summary>
 	class PowerUpManiger : public virtual Core::IScript {
 	public:
 		enum class PowerUpType
@@ -383,13 +355,15 @@ namespace Scripts {
 	private:
 
 
-		int frame = 0;
+		// calculate the time between frames given a certain rmp at with the orb revolves (50 in this case)
 		float const rpm = 50;
 		float const time_to_wait = (60 / rpm) / 6;
+
+		int frame = 0;
 		float time_remaning = time_to_wait;
 
 		SpriteRenderer& sprite_renderer;
-		PowerUpType powerup_type;
+		PowerUpType powerup_type{};
 	public:
 
 		Event<int> change_right, change_left;
@@ -448,14 +422,16 @@ namespace Scripts {
 		}
 	};
 
-
+	/// <summary>
+	///  a class that handles initializations point scoring win conditions, and power-up spawns.
+	/// </summary>
 	class PongController : public virtual Core::IScript
 	{
 	private:
 		float time = 0;
 		int left_score_val = 0, right_score_val = 0;
 		Core::TextRenderer* start_text{ nullptr }, * left_score{ nullptr }, * right_score{ nullptr };
-		char start_bool = 0b0000'1111; //preventing updating text multiple times
+		char start_bool = 0b0000'1111; // 4 bools compacted in one variable to tracks which countdown numbers (3,2,1,GO) have been shown.
 		bool game_started = false, with_ai;
 
 		float time_to_next_spawn = 2.0f;
@@ -487,19 +463,6 @@ namespace Scripts {
 			}
 		}
 
-	public:
-		static float ball_speed;
-		static const float max_ball_speed;
-
-		static float min_time_to_next_spawn;
-		static float max_time_to_next_spawn;
-
-		static const vec2 powerup_spawn_range;
-		static const int powerup_size;
-
-
-		PongController(GameObject& ballObj, Trigger& leftTrig, Trigger& rightTrig, GameObject& leftPadle, GameObject& RightPadle, bool a_with_ai) : ball(ballObj), left_trigger(leftTrig), right_trigger(rightTrig), right_padle(RightPadle), left_padle(leftPadle) , with_ai(a_with_ai){}
-
 		void left_scored(GameObject& other) {
 			if (ball != other) fmt::println("scored, but it wasn't the ball");
 			++left_score_val;
@@ -530,6 +493,95 @@ namespace Scripts {
 			checkWin();
 		}
 
+		void do_count_down() {
+			time += Globals::DeltaTime;
+			if (time > 1 && (start_bool & 0b0000'0001)) {
+				start_text->update_text("2");
+				start_bool -= 0b0000'0001;
+			}
+			if (time > 2 && (start_bool & 0b0000'0010)) {
+				start_text->update_text("1");
+				start_bool -= 0b0000'0010;
+			}
+			if (time > 3 && (start_bool & 0b0000'0100)) {
+				start_text->update_text("GO");
+				start_bool -= 0b0000'0100;
+			}
+			if (time > 4 && (start_bool & 0b0000'1000)) {
+				gameobject->queueComponentForRemoval(*start_text);
+				start_text = nullptr;
+				start_bool = 0;
+				game_started = true;
+				setBall();
+
+				ball.activate();
+				left_score->activate();
+				right_score->activate();
+				right_padle.activate();
+				left_padle.activate();
+
+				auto sencery = ObjectManager::get_gameObject("scenery");
+				if (sencery) {
+					sencery.unwrap().activate();
+				}
+				else fmt::println("scenery not found");
+
+			}
+		}
+
+		void spawn_powerup() {
+			int scaledMin = static_cast<int>(min_time_to_next_spawn * 100);
+			int scaledMax = static_cast<int>(max_time_to_next_spawn * 100);
+			int randInt = (rand() % (scaledMax - scaledMin + 1) + scaledMin);
+			time_to_next_spawn = static_cast<float>(randInt / 100.0) + time_to_next_spawn;
+
+			float x = (rand() % static_cast<int>(powerup_spawn_range.x - powerup_size)) - ((powerup_spawn_range.x - powerup_size) / 2.0f) + (Globals::screen_width / 2.0f);
+			float y = (rand() % static_cast<int>(powerup_spawn_range.y - powerup_size)) - ((powerup_spawn_range.y - powerup_size) / 2.0f) + (Globals::screen_height / 2.0f);
+			GameObject* powerup = new GameObject({ x,y });
+
+			int type = (rand() % 100);
+
+			if (type < 25) {
+				type = static_cast<int>(PowerUpManiger::PowerUpType::Speed);
+			}
+			else if (type < 50) {
+				type = static_cast<int>(PowerUpManiger::PowerUpType::Health);
+			}
+			else if (type < 80) {
+				type = static_cast<int>(PowerUpManiger::PowerUpType::Damage);
+			}
+			else {
+				type = static_cast<int>(PowerUpManiger::PowerUpType::Size);
+			}
+
+			SpriteRenderer* sprite = new SpriteRenderer({ 6,4 }, { 0, type }, {}, "assets/spinning orb/sprite_sheet_48x48.png", Core::NPC);
+			PowerUpManiger* pow = new PowerUpManiger(*sprite, static_cast<PowerUpManiger::PowerUpType>(type));
+
+			pow->change_left.AddListener(this, [this](int val) {chang_left_score(val); });
+			pow->change_right.AddListener(this, [this](int val) {chang_right_score(val); });
+
+			powerup->initializeWithComponent(*new Trigger({ static_cast<float>(powerup_size),static_cast<float>(powerup_size) }, {}, "trigger"));
+			powerup->initializeWithComponent(*sprite);
+			powerup->initializeWithComponent(*pow);
+
+			ObjectManager::queueGameObject(*powerup);
+		}
+
+	public:
+		static float ball_speed;
+		static const float max_ball_speed;
+
+		static float min_time_to_next_spawn;
+		static float max_time_to_next_spawn;
+
+		static const vec2 powerup_spawn_range;
+		static const int powerup_size;
+
+
+		PongController(GameObject& ballObj, Trigger& leftTrig, Trigger& rightTrig, GameObject& leftPadle, GameObject& RightPadle, bool a_with_ai) : ball(ballObj), left_trigger(leftTrig), right_trigger(rightTrig), right_padle(RightPadle), left_padle(leftPadle) , with_ai(a_with_ai){}
+
+
+
 		void Start() override {
 
 			start_text = new Core::TextRenderer({ Globals::screen_width / 2.0f, Globals::screen_height / 2.0f }, "3", 75, Color::WHITE, Core::CENTER, Core::UI);
@@ -558,164 +610,17 @@ namespace Scripts {
 
 		void Update() override {
 			if (!game_started) {
-				time += Globals::DeltaTime;
-				if (time > 1 && (start_bool & 0b0000'0001)) {
-					start_text->update_text("2");
-					start_bool -= 0b0000'0001;
-				}
-				if (time > 2 && (start_bool & 0b0000'0010)) {
-					start_text->update_text("1");
-					start_bool -= 0b0000'0010;
-				}
-				if (time > 3 && (start_bool & 0b0000'0100)) {
-					start_text->update_text("GO");
-					start_bool -= 0b0000'0100;
-				}
-				if (time > 4 && (start_bool & 0b0000'1000)) {
-					gameobject->queueComponentForRemoval(*start_text);
-					start_text = nullptr;
-					start_bool = 0;
-					game_started = true;
-					setBall();
-
-					ball.activate();
-					left_score->activate();
-					right_score->activate();
-					right_padle.activate();
-					left_padle.activate();
-
-					auto sencery = ObjectManager::get_gameObject("scenery");
-					if (sencery) {
-						sencery.unwrap().activate();
-					}
-					else fmt::println("scenery not found");
-
-				}
+				do_count_down();
 			}
 			else {
 				if (time_to_next_spawn <= 0) {
-					int scaledMin = static_cast<int>(min_time_to_next_spawn * 100);
-					int scaledMax = static_cast<int>(max_time_to_next_spawn * 100);
-					int randInt = (rand() % (scaledMax - scaledMin + 1) + scaledMin);
-					time_to_next_spawn = static_cast<float>(randInt / 100.0) + time_to_next_spawn;
 
-					float x = (rand() % static_cast<int>(powerup_spawn_range.x - powerup_size)) - ((powerup_spawn_range.x - powerup_size) / 2.0f) + (Globals::screen_width / 2.0f);
-					float y = (rand() % static_cast<int>(powerup_spawn_range.y - powerup_size)) - ((powerup_spawn_range.y - powerup_size) / 2.0f) + (Globals::screen_height / 2.0f);
-					GameObject* powerup = new GameObject({ x,y });
-
-					int type = (rand() % 100);
-
-					if (type < 25) {
-						type = static_cast<int>(PowerUpManiger::PowerUpType::Speed);
-					}
-					else if (type < 50) {
-						type = static_cast<int>(PowerUpManiger::PowerUpType::Health);
-					}
-					else if (type < 80) {
-						type = static_cast<int>(PowerUpManiger::PowerUpType::Damage);
-					}
-					else {
-						type = static_cast<int>(PowerUpManiger::PowerUpType::Size);
-					}
-
-					powerup->initializeWithComponent(*new Trigger({ static_cast<float>(powerup_size),static_cast<float>(powerup_size) }, {}, "trigger"));
-					SpriteRenderer* sprite = new SpriteRenderer({ 6,4 }, { 0, type }, {}, "assets/spinning orb/sprite_sheet_48x48.png", Core::NPC);
-					powerup->initializeWithComponent(*sprite);
-					PowerUpManiger* pow = new PowerUpManiger(*sprite, static_cast<PowerUpManiger::PowerUpType>(type));
-					powerup->initializeWithComponent(*pow);
-
-					pow->change_left.AddListener(this, [this](int val) {chang_left_score(val); });
-					pow->change_right.AddListener(this, [this](int val) {chang_right_score(val); });
-
-					ObjectManager::queueGameObject(*powerup);
 				}
 				time_to_next_spawn -= Globals::DeltaTime;
 			}
 		}
 	};
 
-		class PongMenu : public virtual Core::IScript {
-		private:
-			Button* TopButton{ nullptr }, * BottomButton{ nullptr }, * button3{ nullptr }, * button4{ nullptr };
-			bool with_mouse = false;
-
-			void singelplayer() {
-				gameobject->queueComponentForRemoval(*TopButton);
-				gameobject->queueComponentForRemoval(*BottomButton);
-
-				TopButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) - 40 }, "KeyBoard", Color::WHITE);
-				BottomButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 40 }, "mouse", Color::WHITE);
-
-				gameobject->queueComponent(*TopButton);
-				gameobject->queueComponent(*BottomButton);
-
-				TopButton->onClick.AddListener(this, [this]() {keyboard();});
-				BottomButton->onClick.AddListener(this, [this]() {mouce(); });
-			}
-			void multiplayer() {
-				load_pong(false, false, 1);
-			}
-
-			void mouce() {
-				with_mouse = true;
-				set_difecultybutons();
-			}
-
-			void keyboard() {
-				with_mouse = false;
-				set_difecultybutons();
-			}
-
-			void set_difecultybutons() {
-				gameobject->queueComponentForRemoval(*TopButton);
-				gameobject->queueComponentForRemoval(*BottomButton);
-
-				TopButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) - 120 }, "easy", Color::WHITE);
-				BottomButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) - 40 }, "medium", Color::WHITE);
-				button3 = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 40 }, "hard", Color::WHITE);
-				button4 = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 120 }, "impossibles", Color::WHITE);
-
-				gameobject->queueComponent(*TopButton);
-				gameobject->queueComponent(*BottomButton);
-				gameobject->queueComponent(*button3);
-				gameobject->queueComponent(*button4);
-
-				TopButton->onClick.AddListener(this, [this]() {chuse_dificulty_1(); });
-				BottomButton->onClick.AddListener(this, [this]() {chuse_dificulty_2(); });
-				button3->onClick.AddListener(this, [this]() {chuse_dificulty_3(); });
-				button4->onClick.AddListener(this, [this]() {chuse_dificulty_4(); });
-			}
-
-			void chuse_dificulty_1() {
-				load_pong(true, with_mouse, 1);
-			}
-			void chuse_dificulty_2() {
-				load_pong(true, with_mouse, 2);
-			}
-			void chuse_dificulty_3() {
-				load_pong(true, with_mouse, 3);
-			}
-			void chuse_dificulty_4() {
-				load_pong(true, with_mouse, 4);
-			}
-
-		public:
-			void Start() override {
-				TopButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) - 40 }, "one player", Color::WHITE);
-				BottomButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 40 }, "two player", Color::WHITE);
-				gameobject->injectComponent(*TopButton);
-				gameobject->injectComponent(*BottomButton);
-
-				TopButton->onClick.AddListener(this, [this]() {singelplayer(); });
-				BottomButton->onClick.AddListener(this, [this]() {multiplayer(); });
-
-			};
-
-			void Stop() override {};
-
-
-			void Update() override {};
-
-		};
+	
 }
 

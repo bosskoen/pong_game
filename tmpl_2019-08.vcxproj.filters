@@ -35,10 +35,17 @@
     <ClCompile Include="coded_scene.cpp">
       <Filter>until</Filter>
     </ClCompile>
-    <ClCompile Include="Myscript.cpp">
-      <Filter>until</Filter>
+    <ClCompile Include="PongGameScripts.cpp" />
+    <ClCompile Include="button.cpp">
+      <Filter>prebuild</Filter>
     </ClCompile>
-    <ClCompile Include="PongScripts.cpp" />
+    <ClCompile Include="ColBehavior.h">
+      <Filter>prebuild</Filter>
+    </ClCompile>
+    <ClCompile Include="ColBehavior.cpp">
+      <Filter>prebuild</Filter>
+    </ClCompile>
+    <ClCompile Include="PongSceneScripts.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -59,9 +66,6 @@
     </ClInclude>
     <ClInclude Include="Color.h">
       <Filter>until</Filter>
-    </ClInclude>
-    <ClInclude Include="Script.h">
-      <Filter>object code</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
       <Filter>until</Filter>
@@ -90,12 +94,24 @@
     <ClInclude Include="Option.hpp">
       <Filter>until</Filter>
     </ClInclude>
-    <ClInclude Include="Myscript.h">
-      <Filter>until</Filter>
+    <ClInclude Include="PongGameScripts.hpp" />
+    <ClInclude Include="button.h">
+      <Filter>prebuild</Filter>
     </ClInclude>
-    <ClInclude Include="PongScripts.hpp" />
+    <ClInclude Include="Script.h">
+      <Filter>object code\interface</Filter>
+    </ClInclude>
     <ClInclude Include="Component.h">
-      <Filter>object code</Filter>
+      <Filter>object code\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer_interface.h">
+      <Filter>object code\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics_interface.h">
+      <Filter>object code\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider_interface.h">
+      <Filter>object code\interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +123,12 @@
     </Filter>
     <Filter Include="until">
       <UniqueIdentifier>{d1e2a8c9-4796-41f2-9410-7c441132e0fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prebuild">
+      <UniqueIdentifier>{6cd71a5d-8b90-410d-be61-e7b6a62ba2f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object code\interface">
+      <UniqueIdentifier>{1b8b98a6-7fe7-4738-813e-f0ca986ee9be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

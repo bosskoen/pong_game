@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
-#include "renderer.h"
+#include "renderer_interface.h"
 #include <vector>
 #include "Script.h"
-#include "Physics.h"
-#include "Collider.h"
+#include "Physics_interface.h"
+#include "Collider_interface.h"
 #include "Option.hpp"
 
 namespace Core{

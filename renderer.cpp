@@ -9,14 +9,15 @@ namespace Core {
 	void RectRenderer::draw(Surface& screen) {
 		float x = gameobject->pos.x + ofset.x, y = gameobject->pos.y + ofset.y;
 		screen.Bar(static_cast<int>(x - size.x / 2), static_cast<int>(y - size.y / 2),
-		static_cast<int>(x + size.x / 2), static_cast<int>(y + size.y / 2), color.ToInt());
+			static_cast<int>(x + size.x / 2), static_cast<int>(y + size.y / 2), color.ToInt());
 
 	}
 	void RectRenderer::update_color(Color a_color)
 	{
 		color = a_color;
 	}
-	BoxRenderer::BoxRenderer(vec2 a_size, vec2 a_ofset, Color a_color, RenderLayer a_layer, bool a_active) : size(a_size), color(a_color) { this->ofset = a_ofset; this->layer = a_layer; active = a_active; was_active = a_active;
+	BoxRenderer::BoxRenderer(vec2 a_size, vec2 a_ofset, Color a_color, RenderLayer a_layer, bool a_active) : size(a_size), color(a_color) {
+		this->ofset = a_ofset; this->layer = a_layer; active = a_active; was_active = a_active;
 	}
 
 	void BoxRenderer::draw(Surface& screen)
@@ -48,14 +49,15 @@ namespace Core {
 	void IRenderer::deactivate(bool set_by_gameobject)
 	{
 		if (!set_by_gameobject) {
-			was_active = false;  
+			was_active = false;
 		}
 		else {
-			was_active = active; 
+			was_active = active;
 		}
-		active = false; 
-	}
-	TextRenderer::TextRenderer(vec2 ofset, const string& test, int pxl, Color color, Alingment aling,RenderLayer layer, bool a_active)
+		active = false;
+	} // TODO Fix bug - calling deactivate twice causes was_active to be false, even if it shouldn't be.
+
+	TextRenderer::TextRenderer(vec2 ofset, const string& test, int pxl, Color color, Alingment aling, RenderLayer layer, bool a_active)
 	{
 		this->ofset = ofset;
 		set_text(test, pxl, color);
@@ -66,6 +68,7 @@ namespace Core {
 	}
 	void TextRenderer::rerender_text() {
 		if (pxl % 5 == 0) {
+			// use printScaled function to generate Text natively
 			int fond_div_down = pxl / 5;
 			int width = ((static_cast<int>(text_string.length()) - 1) * 6 + 5) * fond_div_down;
 			int height = 5 * fond_div_down;
@@ -75,17 +78,18 @@ namespace Core {
 			this->text.PrintScaled(text_string.c_str(), 0, 0, fond_div_down, fond_div_down, color.ToInt());
 		}
 		else {
+			// Use printScaled to generate text at the closest native size, then scale it to the target size.
 			bool upscale = pxl > 10;
 
 			int chosenSize = upscale ? pxl / 5 : pxl / 5 + 1;
 
-			// Generate text at the closest multiple of 6
-			Surface temp{ static_cast<int>((text_string.length()-1) * 6 * chosenSize+ 5 * chosenSize), 5 * chosenSize };
+			// Generate text at the closest multiple of 5
+			Surface temp{ static_cast<int>((text_string.length() - 1) * 6 * chosenSize + 5 * chosenSize), 5 * chosenSize };
 			temp.Clear(0);
 			temp.PrintScaled(text_string.c_str(), 0, 0, chosenSize, chosenSize, color.ToInt());
 
 			// Resize to the exact required size
-			this->text = Surface{ static_cast<int>((text_string.length()-1) *(6.0/5.0) * pxl  +pxl), pxl };
+			this->text = Surface{ static_cast<int>((text_string.length() - 1) * (6.0 / 5.0) * pxl + pxl), pxl };
 			this->text.Resize(&temp);
 		}
 		need_update = false;
@@ -101,7 +105,7 @@ namespace Core {
 			text.CopyTo(&screen, static_cast<int> (x), static_cast<int>(y));
 			break;
 		case TOPCENTER:
-			text.CopyTo(&screen, static_cast<int>(x - text.GetWidth() /2.0), static_cast<int>(y));
+			text.CopyTo(&screen, static_cast<int>(x - text.GetWidth() / 2.0), static_cast<int>(y));
 			break;
 		case TOPRIGHT:
 			text.CopyTo(&screen, static_cast<int>(x - text.GetWidth()), static_cast<int> (y));
@@ -128,7 +132,7 @@ namespace Core {
 	}
 	void TextRenderer::set_text(const string& text, int pxl, Color color)
 	{
-		
+
 		this->text_string = text;
 		this->pxl = pxl;
 		this->color = color;
@@ -143,18 +147,19 @@ namespace Core {
 		set_text(text_string, pxl, a_color);
 	}
 
-	void TextRenderer::scale_text(int new_pxl)
+	void TextRenderer::update_scale(int new_pxl)
 	{
 		set_text(text_string, new_pxl, color);
 	}
-	SpriteRenderer::SpriteRenderer(vec2int a_frame_count, vec2int frame, vec2 a_ofset ,const string& a_sprite_map, RenderLayer a_layer, bool a_active)
+
+	SpriteRenderer::SpriteRenderer(vec2int a_frame_count, vec2int frame, vec2 a_ofset, const string& a_sprite_map, RenderLayer a_layer, bool a_active)
 	{
 		this->sprite_map = ResourceManager::LoadImage(a_sprite_map.c_str());
 		if (this->sprite_map == nullptr) Panic("Sprite map not found");
 
+		// Validate that the sprite map can hold the specified number of frames
 		if (a_frame_count.x < 1 || a_frame_count.y < 1) Panic("Frame count must be greater than 0");
 		if (sprite_map->GetWidth() % a_frame_count.x != 0 || sprite_map->GetHeight() % a_frame_count.y != 0) Panic("Frame count must be a multiple of the sprite map");
-	
 
 		frame_count = a_frame_count;
 
@@ -176,18 +181,19 @@ namespace Core {
 		Pixel* screen_buffer = screen.GetBuffer();
 		Pixel* image_buffer = sprite_map->GetBuffer();
 
+		// validate draw position
 		if (!screen_buffer || !image_buffer) return;
 
 		if (x_pos >= screen.GetWidth() || y_pos >= screen.GetHeight() ||
 			x_pos + frame_size.x <= 0 || y_pos + frame_size.y <= 0) return;
 
-		int draw_x = max(0, x_pos);
-		int draw_y = max(0, y_pos);
-		int end_x = min(screen.GetWidth(), x_pos + frame_size.x);
-		int end_y = min(screen.GetHeight(), y_pos + frame_size.y);
+		int draw_x = std::max(0, x_pos);
+		int draw_y = std::max(0, y_pos);
+		int end_x = std::min(screen.GetWidth(), x_pos + frame_size.x);
+		int end_y = std::min(screen.GetHeight(), y_pos + frame_size.y);
 
-		int start_x = max(0, -x_pos);
-		int start_y = max(0, -y_pos);
+		int start_x = std::max(0, -x_pos);
+		int start_y = std::max(0, -y_pos);
 
 		int lines_to_draw = end_y - draw_y;
 		int pixels_per_line = end_x - draw_x;
@@ -197,6 +203,7 @@ namespace Core {
 
 		for (int y = 0; y < lines_to_draw; y++) {
 			for (int x = 0; x < pixels_per_line; x++) {
+				//Only render pixels with sufficient alpha transparency
 				if ((image_buffer[x] >> 24) > 127) screen_buffer[x] = image_buffer[x];
 			}
 			screen_buffer += screen.GetWidth();
@@ -205,12 +212,12 @@ namespace Core {
 	}
 	void SpriteRenderer::set_frame(vec2int new_frame)
 	{
-		if (frame_count.x - 1 < new_frame.x || frame_count.y-1 < new_frame.y) Panic("Frame out of bounds");
+		if (frame_count.x - 1 < new_frame.x || frame_count.y - 1 < new_frame.y) Panic("Frame out of bounds");
 		current_frame = new_frame;
 		start_in_buffer = current_frame.x * frame_size.x + current_frame.y * frame_size.y * sprite_map->GetWidth();
 	}
 	void SpriteRenderer::set_frame(int v) {
-		if (v > frame_count.x * frame_count.y -1) Panic("Frame out of bounds");
-		set_frame( { v % frame_count.x, v / frame_count.x });
+		if (v > frame_count.x * frame_count.y - 1) Panic("Frame out of bounds");
+		set_frame({ v % frame_count.x, v / frame_count.x });
 	}
 }

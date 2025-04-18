@@ -1,48 +1,14 @@
 #pragma once
+#include "renderer_interface.h"
 
-#include "template.h"
 #include "Color.h"
 #include "ResourceManager.h"
-#include "Component.h"
-
 
 using namespace Tmpl8;
 using namespace Util;
 using std::string;
 
 namespace Core {
-	enum RenderLayer {
-		Sky,
-		BackGround,
-		Map,
-		NPC,
-		Player,
-		ForeGround,
-		UI
-	};
-
-	class GameObject;
-
-	class IRenderer : public virtual Component
-	{
-	protected:
-		RenderLayer layer{ Sky };
-		bool active{ true }, was_active{ true };
-
-	public:
-
-		virtual void draw(Tmpl8::Surface& screen) = 0;
-		vec2 ofset{ vec2() };
-		virtual ~IRenderer() = default;
-
-		RenderLayer get_layer() const;
-		void set_layer(RenderLayer new_layer);
-
-		void activate();
-		void deactivate(bool set_by_gameobject = false);
-		bool isActive() const { return active; };
-		bool wasActive() const { return was_active; };
-	};
 
 	class RectRenderer : public virtual IRenderer {
 		Color color {Color()};
@@ -88,7 +54,7 @@ namespace Core {
 		void set_text(const string& text, int pxl, Color color);
 		void update_text(const string& text);
 		void update_color(Color color);
-		void scale_text(int new_pxl);
+		void update_scale(int new_pxl);
 
 	private:
 		void rerender_text();

@@ -1,18 +1,11 @@
 #pragma once
-#include "ObjectManager.h"
+#include "Script.h"
+#include "renderer.h"
 #include "Event.hpp"
 
 using namespace Core;
 
-namespace Scripts {
-	class MyScrip : public virtual Core::IScript
-	{
-	public:
-		void Start() override;
-		void Stop() override;
-		void Update() override;
-	};
-
+namespace PreBuild {
 	class Button : public virtual Core::IScript
 	{
 	private:
@@ -30,6 +23,11 @@ namespace Scripts {
 		static constexpr int marginX = 4;
 		static constexpr int marginY = 4;
 
+		/// <summary>
+		/// dims the color with a given percentage, range [0 , 1]
+		/// </summary>
+		/// <param name="dim_bright"></param>
+		/// <returns></returns>
 		Color::HSL cahnge_color(float dim_bright) const {
 			Color::HSL c = color;
 			c.l *= (1.0f - dim_bright);

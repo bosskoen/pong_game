@@ -11,11 +11,9 @@ namespace Util {
 		public:
 			float h{ 0 }, s{ 0 }, l{ 0 };
 
-
-
 			HSL() = default;
 			HSL(float a_h, float a_s, float a_l) : h(a_h), s(a_s), l(a_l) {}
-			HSL(Color a_color) { *this = a_color.ToHSL(); };
+			HSL(Color a_color) : HSL(a_color.ToHSL()) {}
 
 			Color ToColor() const;
 

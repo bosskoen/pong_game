@@ -2,17 +2,16 @@
 #include <iostream>
 #include "fmt_includes.h"
 
-
-    #ifdef _DEBUG
-
+// if debugging pause the program to read the error message
+#ifdef _DEBUG
     #define PAUSE_IF_DEBUGGING   \
       do { \
         system("pause");\
         } while(0)
 
-    #else // !_DEBUG
+#else // !_DEBUG
     #define PAUSE_IF_DEBUGGING do {} while(0)
-    #endif
+#endif
 
 #define TODO(msg, ...)  \
     do{\
@@ -21,7 +20,7 @@
     std::exit(1); \
 }while (0)
 
-
+// gracefully exits the program instead of crash
 #define Panic(msg, ...)  \
 do {    \
     fmt::println(stderr, "Manual abort at [{}:{} in {}]:\n{}", __FILE__, __LINE__, __func__, fmt::format(msg, ##__VA_ARGS__)); \

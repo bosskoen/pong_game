@@ -5,19 +5,30 @@
 
 #define FPSCOUNT
 
+//make friend work
+namespace Tmpl8 {
+    class Game; 
+}
+
 class Globals {
 private:
 
 
 public:
+	/// <summary>
+	/// time passed since the last frame
+	/// </summary>
 	static float DeltaTime;
-	static int screen_width;
-	static int screen_height;
+	static const int& screen_width;
+	static const int& screen_height;
     static float gravity;
     static float jump_inpuls;
     static float move_acceleration;
     static float air_control;
     static float max_move_speed;
+    /// <summary>
+    /// total uptime of the game
+    /// </summary>
     static float Time;
 
     static void ExitApp();
@@ -25,7 +36,7 @@ public:
 };
 
 namespace Util {
-    enum Key;
+    enum class Key;
     enum class MouseButton;
 
     class Input {
@@ -39,24 +50,32 @@ namespace Util {
         static std::unordered_map<Key, Status> keyStatus;
         static std::unordered_map<MouseButton, Status> mouseStatus;
 
+        // handles button press and release events
+        static void MouseDownEvent(MouseButton key);
+        static void MouseUpEvent(MouseButton key);
+        static void KeyDownEvent(Key key);
+        static void KeyUpEvent(Key key);
+
+        /// <summary>
+        /// updates the list to track the state of all buttons
+        /// </summary>
+        static void TickList();
+
+
     public:
         static Tmpl8::vec2int mousePos();
+
         static bool GetMouseHeld(MouseButton key);
         static bool GetMouseDown(MouseButton key);
         static bool GetMouseUp(MouseButton key);
         static bool GetMouse(MouseButton key);
 
-        static void MouseDownEvent(MouseButton key);
-        static void MouseUpEvent(MouseButton key);
-   
         static bool GetKeyHeld(Key key);
         static bool GetKeyDown(Key key);
         static bool GetKeyUp(Key key);
         static bool GetKey(Key key);
 
-        static void TickList();
-        static void KeyDownEvent(Key key);
-        static void KeyUpEvent(Key key);
+        friend class Tmpl8::Game; //TODO look if there is a way to make only the functions friends,
     };
 
     enum class MouseButton {
@@ -67,7 +86,7 @@ namespace Util {
 		Forwards = 5
 	};
 
-    enum Key {
+    enum class Key {
         Unknown = 0,
         A = 4,
         B = 5,

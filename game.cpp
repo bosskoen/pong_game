@@ -2,13 +2,16 @@
 #include "surface.h"
 
 #include "ObjectManager.h"
-#include "GameObject.h"
-#include "PongScripts.hpp"
 
 #include "coded_scene.h"
 
+#include "Globals.h"
+#include "ResourceManager.h"
+
 
 using namespace Core;
+using Util::ResourceManager;
+using Util::Input;
 
 namespace Tmpl8
 {
@@ -30,15 +33,8 @@ namespace Tmpl8
 		showfps = Globals::screen_height > 10 && Globals::screen_width > 48;
 #endif // FPSCOUNT
 		std::srand(static_cast<unsigned int>(std::time(nullptr)));
-		float x = 10;
-		//for (int i = 15; i < 37; i++) {
-		//	GameObject* obj = new GameObject();
-		//	obj->injectComponent(*new TextRenderer({ x, 100 }, "H", i, Color::GREEN, CENTER, UI));
-		//	ObjectManager::injectGameObject(*obj);
-		//	x += i + 5;
-		//}
 
-		load_pong_menu();
+		Util::load_pong_menu();
 
 		if (screen) {
 			ObjectManager::render(*screen);
@@ -63,7 +59,7 @@ namespace Tmpl8
 	void Game::Tick(float deltaTime)
 	{
 		Globals::DeltaTime = deltaTime > 1/24.0f*1000 ? 1/24.0f : deltaTime/1000;
-		Globals::Time = deltaTime * 1000;
+		Globals::Time = deltaTime/1000;
 		
 		if (screen) {
 			screen->Clear(0);
@@ -78,7 +74,7 @@ namespace Tmpl8
 		if (showfps) {
 			if (timepased > UPDATETIME && framecount != 0)
 			{
-				int fps = static_cast<int>(((framecount * 1000.0) / timepased) + 0.5);
+				int fps = static_cast<int>(((framecount * 1000.0f) / timepased) + 0.5f);
 				fps_string = "FPS: " + std::to_string(fps);
 				timepased = 0;
 				framecount = 0;
@@ -106,11 +102,11 @@ namespace Tmpl8
 
 	void Game::KeyDown(int key)
 	{
-		Util::Input::KeyDownEvent(static_cast<Util::Key>(key));
+		Input::KeyDownEvent(static_cast<Util::Key>(key));
 	}
 
 	void Game::KeyUp(int key)
 	{
-		Util::Input::KeyUpEvent(static_cast<Util::Key>(key));
+		Input::KeyUpEvent(static_cast<Util::Key>(key));
 	}
 };

@@ -215,15 +215,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="coded_scene.cpp" />
+    <ClCompile Include="ColBehavior.cpp" />
+    <ClCompile Include="ColBehavior.h" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="Myscript.cpp" />
+    <ClCompile Include="button.cpp" />
+    <ClCompile Include="PongSceneScripts.hpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
-    <ClCompile Include="PongScripts.cpp" />
+    <ClCompile Include="PongGameScripts.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="surface.cpp" />
@@ -232,6 +235,7 @@
   <ItemGroup>
     <ClInclude Include="coded_scene.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="Collider_interface.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Event.hpp" />
@@ -241,10 +245,12 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Option.hpp" />
     <ClInclude Include="Physics.h" />
-    <ClInclude Include="Myscript.h" />
+    <ClInclude Include="button.h" />
     <ClInclude Include="ObjectManager.h" />
-    <ClInclude Include="PongScripts.hpp" />
+    <ClInclude Include="Physics_interface.h" />
+    <ClInclude Include="PongGameScripts.hpp" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="renderer_interface.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Script.h" />
     <ClInclude Include="surface.h" />

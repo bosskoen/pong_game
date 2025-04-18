@@ -2,14 +2,18 @@
 #include "SDL.h"
 
 float Globals::DeltaTime = 0;
-int Globals::screen_width = 800;
-int Globals::screen_height = 600;
+
+// set in Tmpl8, a different cases point
+const int& Globals::screen_width = ScreenWidth;
+const int& Globals::screen_height = ScreenHeight;
+
 float Globals::gravity = 400;
 float Globals::jump_inpuls = 400;
 float Globals::move_acceleration = 2000;
 float Globals::air_control = 0.2;
 float Globals::max_move_speed = 200;
 float Globals::Time = 0;
+
 std::unordered_map<Util::Key, Util::Input::Status> Util::Input::keyStatus;
 std::unordered_map<Util::MouseButton, Util::Input::Status> Util::Input::mouseStatus;
 

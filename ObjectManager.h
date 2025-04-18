@@ -2,7 +2,10 @@
 #include "GameObject.h"
 #include "Option.hpp"
 
-using namespace std;
+#include "game.h"
+
+using std::vector;
+using Util::Option;
 
 namespace Core{
 	class ObjectManager
@@ -29,6 +32,13 @@ namespace Core{
 		static void collisionCheck(IAABB& collider1, IAABB& collider2);
 		static void collisionUpdate(std::vector<GameObject*>& gameobjects);
 
+		static void render(Surface& screen);
+
+		/// <summary>
+		/// calls update on all Game objects managed
+		/// </summary>
+		/// <param name="screen"></param>
+		static void update(Tmpl8::Surface& screen);
 	public:
 
 		static bool rebuild_render_list, reorder_renderlist;
@@ -57,18 +67,10 @@ namespace Core{
 		/// </summary>
 		static void queueGameObjectForRemoval(GameObject& existing_object);
 
-		
-
-		/// <summary>
-		/// calls update on all Game objects managed
-		/// </summary>
-		/// <param name="screen"></param>
-		static void update(Tmpl8::Surface& screen);
-		static void render(Surface& screen);
-
 		static Option<GameObject&> get_gameObject(const std::string& name);
-		static vector<GameObject&> get_gameObject_byLabel(const Label& label);
 
 		friend class GameObject;
+		friend void Tmpl8::Game::Tick(float);
+		friend void Tmpl8::Game::Init();
 	};
 }

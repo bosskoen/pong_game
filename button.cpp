@@ -1,7 +1,8 @@
-#include "Myscript.h"
+#include "button.h"
+#include "Globals.h"
+#include "GameObject.h"
 
-namespace Scripts {
-
+namespace PreBuild {
 
 	void Button::Update() {
 		vec2int mouse_pos = Input::mousePos();

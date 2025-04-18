@@ -1,4 +1,4 @@
-#include "PongScripts.hpp"
+#include "PongGameScripts.hpp"
 
 namespace Scripts {
 	float PongController::ball_speed = 300;

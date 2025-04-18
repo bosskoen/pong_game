@@ -1,30 +1,9 @@
 #pragma once
 #include "Globals.h"
-
-#include "Component.h"
+#include "Physics_interface.h"
 
 namespace Core {
 	class GameObject;
-
-	enum class Priority {
-		Low,
-		Movement,
-		Gravity,
-		Friction,
-		High,
-	};
-
-	class IPhysics : public virtual Component
-	{
-	protected:
-
-	public:
-		virtual void Update() = 0;
-		virtual void Start() = 0;
-
-		virtual Priority getPriority() const = 0;
-		virtual ~IPhysics() = default;
-	};	//TODO set order of operation
 
 	class Gravity : public virtual IPhysics
 	{
@@ -57,7 +36,7 @@ namespace Core {
 
 	class FlappyController : public virtual IPhysics {
 	private:
-		Util::Key controle_button{ Util::Space };
+		Util::Key controle_button{ Util::Key::Space };
 	public:
 		FlappyController() = default;
 		FlappyController(Util::Key button) : controle_button(button) {};

@@ -37,7 +37,6 @@ extern "C"
 #include "wglext.h"
 #endif
 
-#include "Globals.h"
 #include <string>
 
 namespace Tmpl8 { 
@@ -367,8 +366,6 @@ int main( int argc, char **argv )
 	window = SDL_CreateWindow(TemplateVersion, 100, 100, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN );
 #endif
 	surface = new Surface( ScreenWidth, ScreenHeight );
-	Globals::screen_height = ScreenHeight;
-	Globals::screen_width = ScreenWidth;
 	surface->Clear( 0 );
 	SDL_Renderer* renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
 	SDL_Texture* frameBuffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, ScreenWidth, ScreenHeight );

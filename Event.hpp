@@ -4,6 +4,21 @@
 
 
 namespace Core{
+	/// <summary>
+    /// A simple generic event system that supports adding/removing listeners
+    /// based on an identifying key (typically the 'this' pointer of the object adding it).
+    ///
+    /// Usage:
+    ///     event.AddListener(this, [](){ ... });
+    ///     event.Invoke(...);
+    ///     event.RemoveListener(this);
+    ///
+    /// Limitations:
+    ///     - Only one listener per object (key) by default.
+    ///     - If multiple listeners per object are needed, consider rewriting the mapping
+    ///       or use the questionable way (see TODOs).
+	/// </summary>
+	/// <typeparam name="...Args"></typeparam>
 	template<typename... Args>
 	class Event
 	{
@@ -46,6 +61,7 @@ namespace Core{
 	template<typename ...Args>
 	inline void Event<Args...>::Invoke(Args ...args)
 	{
+        // copy list so the callback can be completed even if the event gets destroyed in the proses
         auto listeners_copy = m_Listeners;  
         for (std::pair<void* const, std::function<void(Args...)>> listener : listeners_copy) {
             listener.second(args...);
@@ -57,10 +73,7 @@ namespace Core{
 	{
         m_Listeners.clear();
 	}
-    //TDOD can change to work with vec need to chang how to add function
-    //auto myCallback = [this]() { move_right(); }; //make fuction
-    //event.AddListener(this, myCallback); //add to event
-    //event.RemoveListener(this, myCallback); //remove the same object
 
-    //right.AddListener(this, [this]() {move_right();}); //make fuction and add to event, but dont store object or piotner
+    //TODO can work with vec, make it one object that holds the key and the function,
+    //TODO create a object that can compare its self, holds a void*/size_t/... to the owner object and a index and make a save system for holding more listener from one object, or do it the questionable way by { reinturpret_cast<void*>(this) + 1 }
 }

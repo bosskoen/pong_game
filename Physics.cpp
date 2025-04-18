@@ -1,5 +1,10 @@
 #include "Physics.h"
 #include "GameObject.h"
+#include "template.h"
+
+using Util::Input;
+using Util::Key;
+using Tmpl8::vec2;
 
 namespace Core {
 
@@ -16,9 +21,9 @@ namespace Core {
 	}
 	void PlatformerController::Update()
 	{
-        float move_dir = static_cast<float>(Input::GetKey(D) - Input::GetKey(A));
+        float move_dir = static_cast<float>(Input::GetKey(Key::D) - Input::GetKey(Key::A));
 
-        if (gameobject->ColStat == Grounded && Input::GetKeyDown(Space)) {
+        if (gameobject->ColStat == Grounded && Input::GetKeyDown(Key::Space)) {
             gameobject->velocity.y = vec2::UP.y * Globals::jump_inpuls;
             gameobject->ColStat = Air;
         }
@@ -39,7 +44,7 @@ namespace Core {
 	}
     void TopDownController::Update()
     {
-        vec2 move_dir(static_cast<float>(Input::GetKey(D) - Input::GetKey(A)), static_cast<float>(Input::GetKey(S) - Input::GetKey(W)));
+        vec2 move_dir(static_cast<float>(Input::GetKey(Key::D) - Input::GetKey(Key::A)), static_cast<float>(Input::GetKey(Key::S) - Input::GetKey(Key::W)));
         if (move_dir.x == 0 && move_dir.y == 0) return;
         move_dir.normalize(); // won't work if a controller is used
         
