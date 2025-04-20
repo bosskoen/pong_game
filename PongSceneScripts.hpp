@@ -92,7 +92,7 @@ namespace Scripts {
 			TopButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) - 120 }, "easy", Color::WHITE);
 			BottomButton = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) - 40 }, "medium", Color::WHITE);
 			button3 = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 40 }, "hard", Color::WHITE);
-			button4 = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 120 }, "impossibles", Color::WHITE);
+			button4 = new Button({ 300, 65 }, { Globals::screen_width / 2.0f, (Globals::screen_height / 2.0f) + 120 }, "impossible", Color::WHITE);
 
 			gameobject->queueComponent(*TopButton);
 			gameobject->queueComponent(*BottomButton);

@@ -39,9 +39,6 @@
     <ClCompile Include="button.cpp">
       <Filter>prebuild</Filter>
     </ClCompile>
-    <ClCompile Include="ColBehavior.h">
-      <Filter>prebuild</Filter>
-    </ClCompile>
     <ClCompile Include="ColBehavior.cpp">
       <Filter>prebuild</Filter>
     </ClCompile>
@@ -112,6 +109,10 @@
     </ClInclude>
     <ClInclude Include="Collider_interface.h">
       <Filter>object code\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ball_info.h" />
+    <ClInclude Include="ColBehavior.h">
+      <Filter>prebuild</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

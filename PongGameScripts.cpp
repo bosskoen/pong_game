@@ -2,7 +2,7 @@
 
 namespace Scripts {
 	float PongController::ball_speed = 300;
-	float const PongController::max_ball_speed = 875;
+	float const BallInfo::max_ball_speed = 875;
 	float PlayerPadleControler::default_speed = 400;
 
 	float PongController::min_time_to_next_spawn = 10.0f;
@@ -16,4 +16,5 @@ namespace Scripts {
 
 	const float PowerTracker::size_up_factor = 1.5f;
 	const float PowerTracker::size_up_time = 9.0f;
+
 }

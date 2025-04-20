@@ -1,7 +1,6 @@
 #include "ColBehavior.h"
-#include "GameObject.h"
 
-#include "PongGameScripts.hpp"
+#include "ball_info.h"
 
 using Core::CollidedState;
 
@@ -91,7 +90,7 @@ namespace PreBuild {
 					float half_pedle_hight = ((static_collider.size.y * 0.95f) / 2.0f);  // the 0.95 is for steeper bounces 
 					vec2 temp = { -1,delta / half_pedle_hight };
 					temp.normalize();
-					temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::PongController::max_ball_speed); // ball speed increases with 5% every touch
+					temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::BallInfo::max_ball_speed); // ball speed increases with 5% every touch
 					other.gameobject->velocity = temp;
 				}
 				break;
@@ -102,7 +101,7 @@ namespace PreBuild {
 					float half_pedle_hight = ((static_collider.size.y * 0.95f) / 2.0f);  // the 0.95 is for steeper bounces 
 					vec2 temp = { 1,delta / half_pedle_hight };
 					temp.normalize();
-					temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::PongController::max_ball_speed); // ball speed increases with 5% every touch
+					temp *= std::min(other.gameobject->velocity.length() * 1.05f, Scripts::BallInfo::max_ball_speed); // ball speed increases with 5% every touch
 					other.gameobject->velocity = temp;
 				}
 				break;

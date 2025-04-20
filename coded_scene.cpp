@@ -4,6 +4,8 @@
 #include "PongGameScripts.hpp"
 #include "PongSceneScripts.hpp"
 
+#include "ColBehavior.h"
+
 using namespace Core;
 
 namespace Util {
@@ -24,7 +26,7 @@ namespace Util {
 		GameObject* leftPadle = new GameObject{ "left_padle", {30, Globals::screen_height / 2.0f}, false };
 		{
 			RectRenderer* renderer = new RectRenderer({ 10,100 }, {}, Color::WHITE, Core::Player);
-			Collider* col = new Collider{ {10,104},{},PreBuild::PongPadleCollision};
+			Collider* col = new Collider{ {10,104},{}, PreBuild::PongPadleCollision};
 
 			// decide with paddle controller to use;
 			IScript* script = with_AI ? static_cast<IScript*>(new Scripts::PongAI(*ball, difuculty)) : static_cast<IScript*>(new Scripts::PlayerPadleControler(with_AI, with_mouce));

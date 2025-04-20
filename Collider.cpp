@@ -1,6 +1,5 @@
 #include "Collider.h"
 #include "GameObject.h"
-#include "fmt_includes.h"
 
 #ifdef _DEBUG
 #include "Color.h"

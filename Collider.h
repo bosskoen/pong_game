@@ -1,9 +1,5 @@
 #pragma once
-#include "template.h"
 #include "Event.hpp"
-#include "MACRO.hpp"
-#include "surface.h"
-#include "Collider_interface.h"
 
 #include "ColBehavior.h"
 

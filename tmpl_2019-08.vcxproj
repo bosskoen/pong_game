@@ -216,7 +216,6 @@
   <ItemGroup>
     <ClCompile Include="coded_scene.cpp" />
     <ClCompile Include="ColBehavior.cpp" />
-    <ClCompile Include="ColBehavior.h" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="game.cpp" />
@@ -233,7 +232,9 @@
     <ClCompile Include="template.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ball_info.h" />
     <ClInclude Include="coded_scene.h" />
+    <ClInclude Include="ColBehavior.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Collider_interface.h" />
     <ClInclude Include="Color.h" />

@@ -7,23 +7,13 @@
 
 #include "Collider.h"
 
+#include "ball_info.h"
+
 
 using namespace Core;
 
 
 namespace Scripts {
-
-	/// <summary>
-	/// small data class that tracks what the last hit is so power ups can be added properly
-	/// </summary>
-	class BallInfo : public virtual Core::IScript {
-	public:
-		GameObject* last_hit{ nullptr };
-		
-		void Start() override {}
-		void Stop() override {}
-		void Update() override {}
-	};
 
 	/// <summary>
 	/// a class that lets the player or players control the paddle(s).
@@ -569,7 +559,6 @@ namespace Scripts {
 
 	public:
 		static float ball_speed;
-		static const float max_ball_speed;
 
 		static float min_time_to_next_spawn;
 		static float max_time_to_next_spawn;
@@ -614,7 +603,7 @@ namespace Scripts {
 			}
 			else {
 				if (time_to_next_spawn <= 0) {
-
+					spawn_powerup();
 				}
 				time_to_next_spawn -= Globals::DeltaTime;
 			}

@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "renderer_interface.h"
 #include <vector>
 #include "Script.h"
