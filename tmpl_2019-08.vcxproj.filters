@@ -43,6 +43,7 @@
       <Filter>prebuild</Filter>
     </ClCompile>
     <ClCompile Include="PongSceneScripts.hpp" />
+    <ClCompile Include="ball.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -110,9 +111,12 @@
     <ClInclude Include="Collider_interface.h">
       <Filter>object code\interface</Filter>
     </ClInclude>
-    <ClInclude Include="ball_info.h" />
+    <ClInclude Include="ball.h" />
     <ClInclude Include="ColBehavior.h">
       <Filter>prebuild</Filter>
+    </ClInclude>
+    <ClInclude Include="Cloning.h">
+      <Filter>until</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -136,5 +140,6 @@
     <Text Include="_readme.txt">
       <Filter>template code</Filter>
     </Text>
+    <Text Include="README.md" />
   </ItemGroup>
 </Project>

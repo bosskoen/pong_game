@@ -11,7 +11,7 @@ namespace Scripts {
 	/// <summary>
 	/// setup and manages the win/lose screen of the pong game
 	/// </summary>
-	class PongWin : public virtual Core::IScript {
+	class PongWin : public virtual Cloneable<PongWin, Core::IScript> {
 	private:
 		bool left_won{ false };
 		bool With_AI{ false };
@@ -53,7 +53,7 @@ namespace Scripts {
 	/// <summary>
 	/// setup and manages the begin screen in the pong game were you can select how you want to play
 	/// </summary>
-	class PongMenu : public virtual Core::IScript {
+	class PongMenu : public virtual Cloneable<PongMenu, Core::IScript> {
 	private:
 		Button* TopButton{ nullptr }, * BottomButton{ nullptr }, * button3{ nullptr }, * button4{ nullptr };
 		bool with_mouse = false;

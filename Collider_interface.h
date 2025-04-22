@@ -48,7 +48,7 @@ namespace Core {
 		void setId(std::string a_id) { id = a_id; }
 
 #ifdef _DEBUG
-		void draw_outline(Tmpl8::Surface& screen);
+		void draw_outline(Tmpl8::Surface& screen) const;
 #endif // DEBUG
 
 

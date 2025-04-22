@@ -2,6 +2,8 @@
 #include "Globals.h"
 #include "ObjectManager.h"
 
+#include "Cloning.h"
+
 namespace Core {
 	// Move components and reassign their gameobject pointers to this new object
 	GameObject::GameObject(GameObject&& other) noexcept
@@ -33,24 +35,40 @@ namespace Core {
 	GameObject::GameObject(const GameObject& other)
 	{
 		this->pos = other.pos;
-		this->renderers = other.renderers;
-		this->scripts = other.scripts;
-		this->name = other.name;
-		this->physics = other.physics;
-		this->colliders = other.colliders;
-		for (IRenderer* renderer : renderers) {
-			renderer->gameobject = this;
+		this->name = other.name; 
+		for (IRenderer* renderer : other.renderers) {
+			Util::ICloneable<IRenderer>* clo = dynamic_cast<Util::ICloneable<IRenderer>*>(renderer);
+			if (clo) {
+				IRenderer* new_render = clo->Clone();
+				new_render->gameobject = this;
+				this->renderers.push_back(new_render);
+			}
 		}
-		for (IScript* script : scripts) {
-			script->gameobject = this;
+		for (IScript* script : other.scripts) {
+			Util::ICloneable<IScript>* clo = dynamic_cast<Util::ICloneable<IScript>*>(script);
+			if (clo) {
+				IScript* new_script = clo->Clone();
+				new_script->gameobject = this;
+				this->scripts.push_back(new_script);
+			}
 		}
-		for (IPhysics* physic : physics) {
-			physic->gameobject = this;
+		for (IPhysics* physic : other.physics) {
+			Util::ICloneable<IPhysics>* clo = dynamic_cast<Util::ICloneable<IPhysics>*>(physic);
+			if (clo) {
+				IPhysics* new_phys = clo->Clone();
+				new_phys->gameobject = this;
+				this->physics.push_back(new_phys);
+			}
 		}
-		for (IAABB* collider : colliders) {
-			collider->gameobject = this;
+		for (IAABB* collider : other.colliders) {
+			Util::ICloneable<IAABB>* clo = dynamic_cast<Util::ICloneable<IAABB>*>(collider);
+			if (clo) {
+				IAABB* new_collider = clo->Clone();
+				new_collider->gameobject = this;
+				this->colliders.push_back(new_collider);
+			}
 		}
-	}// TODO: dosing copy the component in the vector so the pointer share a component so potential for double deletion bug or others
+	}
 
 	void GameObject::_Direct_AddRenderer(IRenderer& renderer) {
 		renderer.gameobject = this;

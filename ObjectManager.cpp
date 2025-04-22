@@ -34,7 +34,27 @@ namespace Core {
 			object->isInManiger = false;
 			delete object;
 		}
-		//TODO: delete all things in add vectors to prevent memory leaks
+		// All dynamically allocated components and objects in add queues have been deleted above
+		for (GameObject* object : pendingAddGameObjects) {
+			delete object;
+		}
+		pendingAddGameObjects.clear();
+		for (auto& pair : scriptsAdd) {
+			delete pair.second;
+		}
+		scriptsAdd.clear();
+		for (auto& pair : physicsAdd) {
+			delete pair.second;
+		}
+		physicsAdd.clear();
+		for (auto& pair : renderersAdd) {
+			delete pair.second;
+		}
+		renderersAdd.clear();
+		for (auto& pair : collidersAdd) {
+			delete pair.second;
+		}
+		collidersAdd.clear();
 		game_objects.clear();
 	}
 
@@ -79,20 +99,20 @@ namespace Core {
 			object->isInManiger = true;
 		}
 		// --- add elements --- 
-		for (auto& [object, script] : scriptsAdd) {
-			object->_Direct_AddScript(*script);
+		for (auto& pair : scriptsAdd) {
+			pair.first->_Direct_AddScript(*pair.second);
 		}
 		
-		for (auto& [object, script] : physicsAdd) {
-			object->_Direct_AddPhysics(*script);
+		for (auto& pair : physicsAdd) {
+			pair.first->_Direct_AddPhysics(*pair.second);
 		}
 		
-		for (auto& [object, script] : renderersAdd) {
-			object->_Direct_AddRenderer(*script);
+		for (auto& pair : renderersAdd) {
+			pair.first->_Direct_AddRenderer(*pair.second);
 		}
 		
-		for (auto& [object, script] : collidersAdd) {
-			object->_Direct_AddCollider(*script);
+		for (auto& pair : collidersAdd) {
+			pair.first->_Direct_AddCollider(*pair.second);
 		}
 		
 		// --- start scripts --- 
@@ -220,6 +240,17 @@ namespace Core {
 		}
 		return Util::Option<GameObject&>::None();
 		
+	}
+
+	vector<RefCell<GameObject>> ObjectManager::get_object_by_label(const Label lable)
+	{
+		vector<RefCell<GameObject>> vec{};
+		for (GameObject* object : game_objects) {
+			if (object->label == lable) {
+				vec.push_back(object);
+			}
+		}
+		return vec;
 	}
 
 	void ObjectManager::collisionUpdate(std::vector<GameObject*>& gameobjects) {

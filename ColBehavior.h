@@ -9,5 +9,4 @@ namespace PreBuild {
 	/// perfect elastic collisions.
 	/// </summary>
 	void PerfecBounceCollision(IAABB& other, IAABB& static_collider, ColDir direction, float displasment);
-	void PongPadleCollision(IAABB& other, IAABB& static_collider, ColDir direction, float displasment);
 }

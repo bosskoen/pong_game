@@ -118,4 +118,50 @@ namespace Util {
             return value != nullptr;
         }
     };
+
+    /// <summary>
+    /// A wrapper class that encapsulates a reference to an object.
+    /// This class mimics reference behavior, providing safe access to an existing object
+    /// while supporting pointer - like operations and implicit conversions.
+    /// Does not manage ownership or lifetime.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    template<typename T>
+    class RefCell {
+    private:
+        T* value;
+    public:
+        RefCell() = delete;
+        /// <summary>
+        /// </summary>
+        /// <param name="prt"></param>
+        /// <exception cref="std::invalid_argument">Thrown if ptr is null.</exception>
+        RefCell(T* prt) : value(prt) {
+            if (!value) throw std::invalid_argument("RefCell cannot be initialized with nullptr");
+        }
+        RefCell(T& ref) : value(&ref) {}
+        RefCell(const RefCell& other) : value(other.value) {}
+        RefCell(RefCell&& other) noexcept : value(other.value) {
+            other.value = nullptr;
+        }
+
+        RefCell& operator=(RefCell&& other) noexcept {
+            if (this != &other) {
+                value = other.value;
+                other.value = nullptr;
+            }
+            return *this;
+        }
+
+        RefCell& operator=(const RefCell& other) {
+            if (this != &other) {
+                value = other.value;
+            }
+            return *this;
+        }
+
+        T* operator ->() const { return value; }
+        T& operator ()() const { return *value; }
+        operator T& () const { return *value; }
+    };
 };

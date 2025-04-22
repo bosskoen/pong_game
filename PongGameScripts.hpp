@@ -7,18 +7,18 @@
 
 #include "Collider.h"
 
-#include "ball_info.h"
+#include "ball.h"
 
 
 using namespace Core;
-
+using Util::Cloneable;
 
 namespace Scripts {
 
 	/// <summary>
 	/// a class that lets the player or players control the paddle(s).
 	/// </summary>
-	class PlayerPadleControler :public virtual Core::IScript {
+	class PlayerPadleControler :public virtual Cloneable<PlayerPadleControler, Core::IScript> {
 	private:
 		bool two_palyer{ false }, is_right{ true }, mouce{ true };
 
@@ -75,7 +75,7 @@ namespace Scripts {
 	/// <summary>
 	/// a mediocre AI for the paddle
 	/// </summary>
-	class PongAI : public virtual Core::IScript {
+	class PongAI : public virtual Cloneable<PongAI, Core::IScript> {
 	private:
 		GameObject& ball;
 		int difuculty;
@@ -84,6 +84,7 @@ namespace Scripts {
 		float move_to = Globals::screen_height / 2.0f;
 
 		int mis_chance = 0; // chance to miss the ball
+		int mis_incr = 0; // increases the mis chance every hit of the AI
 		int style{ 0 };
 
 		RectRenderer* renderer{ nullptr };
@@ -96,6 +97,29 @@ namespace Scripts {
 			float x = pos.x + ((line_y - pos.y) / scaler.y) * scaler.x;
 			return x;
 		}
+
+		void set_dificultie_presets() {
+			switch (difuculty) {
+			case 2: // Medium
+				speed = PlayerPadleControler::default_speed * 0.75f;
+				inacrucy = 20;
+				mis_chance = 15;
+				mis_incr = 2;
+				break;
+			case 3: // Hard
+				speed = PlayerPadleControler::default_speed * 1.05f;
+				inacrucy = 30; // intentionally LESS accurate for unpredictability
+				mis_chance = 0;
+				mis_incr = 1;
+				break;
+			default: // Easy
+				speed = PlayerPadleControler::default_speed * 0.55f;
+				inacrucy = 10;
+				mis_chance = 25;
+				mis_incr = 5;
+				break;
+			}
+		}
 	public:
 		float speed = 0;
 
@@ -104,22 +128,16 @@ namespace Scripts {
 		void Start() override {
 			renderer = &gameobject->getRenderer<RectRenderer>().expect("no renderer found");
 
-			switch (difuculty) {
-			case 2: // Medium
-				speed = PlayerPadleControler::default_speed * 0.75f;
-				inacrucy = 20;
-				mis_chance = 25;
-				break;
-			case 3: // Hard
-				speed = PlayerPadleControler::default_speed * 1.05f;
-				inacrucy = 30; // intentionally LESS accurate for unpredictability
-				break;
-			default: // Easy
-				speed = PlayerPadleControler::default_speed * 0.55f;
-				inacrucy = 10;
-				mis_chance = 55;
-				break;
+			if (auto opt = ObjectManager::get_gameObject("GameControler")) {
+				auto& object = opt.unwrap();
+				if (auto trig_le_opt = object.getCollider<Trigger>("left_trigger")) {
+					trig_le_opt.unwrap().onTriggerEnter.AddListener(this, [this](GameObject&) {set_dificultie_presets();});
+				}
+				if (auto trig_ri_opt = object.getCollider<Trigger>("right_trigger")) {
+					trig_ri_opt.unwrap().onTriggerEnter.AddListener(this, [this](GameObject&) {set_dificultie_presets();});
+				}
 			}
+			set_dificultie_presets();
 			move_to = gameobject->pos.y;
 		}
 		void Stop() override {}
@@ -127,24 +145,38 @@ namespace Scripts {
 		void PredictTargetY() {
 			float targetY = vertical_line_vec_intersect(ball.pos, ball.velocity, gameobject->pos.x);
 
+			vec2 currentPos = ball.pos;
+			vec2 currentVel = ball.velocity;
+
 			// If the prediction goes off-screen, simulate a bounce
 			while (targetY < 0 || targetY > Globals::screen_height) {
-				float bounceY = ball.velocity.y < 0 ? 4.0f : (Globals::screen_height - 4.0f);
-				float bounceX = horezontal_line_vec_intersect(ball.pos, ball.velocity, bounceY);
-				targetY = vertical_line_vec_intersect({ bounceX, bounceY }, { ball.velocity.x, -ball.velocity.y }, gameobject->pos.x);
+				float bounceY = currentVel.y < 0 ? 4.0f : (Globals::screen_height - 4.0f);
+				float bounceX = horezontal_line_vec_intersect(currentPos, currentVel, bounceY);
+
+				// Reflect the velocity
+				currentPos = { bounceX, bounceY };
+				currentVel.y *= -1.0f;
+
+				// Recalculate the target Y from the new bounce
+				targetY = vertical_line_vec_intersect(currentPos, currentVel, gameobject->pos.x);
+
 				if (difuculty < 3) break;
 			}
 
 			// Add difficulty-based randomness
-			int offset = (rand() % (2 * inacrucy)) - inacrucy;
-
-			if(difuculty < 3){
-				int r = rand() % 100;
-				if (r < mis_chance) {
-					int sign = (r % 2 == 0) ? 1 : -1;
-					offset += sign * (40 + (rand() % 25));
-				}
+			int offset = 0;
+			int r = rand() % 100;
+			if (r < mis_chance) {
+				int sign = (r % 2 == 0) ? 1 : -1;
+				offset = sign * (55 + (rand() % 15));
 			}
+			else {
+				offset = (rand() % (2 * inacrucy)) - inacrucy;
+			}
+
+			mis_chance += mis_incr;
+
+			fmt::println("miss change {}", mis_chance);
 
 			float finalY = targetY + offset;
 
@@ -223,7 +255,7 @@ namespace Scripts {
 	/// <summary>
 	/// a class that tracks what power-ups are active in a paddle and changes stats and graphics accordingly
 	/// </summary>
-	class PowerTracker : public virtual Core::IScript {
+	class PowerTracker : public virtual Cloneable<PowerTracker, Core::IScript> {
 	private:
 
 		PongAI* ai{ nullptr };
@@ -333,7 +365,7 @@ namespace Scripts {
 	/// <summary>
 	/// a class that handles the trigger events and animation of a power up
 	/// </summary>
-	class PowerUpManiger : public virtual Core::IScript {
+	class PowerUpManiger : public virtual Cloneable<PowerUpManiger, Core::IScript> {
 	public:
 		enum class PowerUpType
 		{
@@ -415,7 +447,7 @@ namespace Scripts {
 	/// <summary>
 	///  a class that handles initializations point scoring win conditions, and power-up spawns.
 	/// </summary>
-	class PongController : public virtual Core::IScript
+	class PongController : public virtual Cloneable<PongController, Core::IScript>
 	{
 	private:
 		float time = 0;

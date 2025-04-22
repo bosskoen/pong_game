@@ -2,11 +2,12 @@
 #include "Script.h"
 #include "renderer.h"
 #include "Event.hpp"
+#include "Cloning.h"
 
 using namespace Core;
 
 namespace PreBuild {
-	class Button : public virtual Core::IScript
+	class Button : public virtual Cloneable< Button, Core::IScript>
 	{
 	private:
 		enum state { normal, hover, pressed };

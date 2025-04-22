@@ -26,7 +26,7 @@ namespace Util {
 		GameObject* leftPadle = new GameObject{ "left_padle", {30, Globals::screen_height / 2.0f}, false };
 		{
 			RectRenderer* renderer = new RectRenderer({ 10,100 }, {}, Color::WHITE, Core::Player);
-			Collider* col = new Collider{ {10,104},{}, PreBuild::PongPadleCollision};
+			Collider* col = new Collider{ {10,104},{}, Scripts::PongPadleCollision };
 
 			// decide with paddle controller to use;
 			IScript* script = with_AI ? static_cast<IScript*>(new Scripts::PongAI(*ball, difuculty)) : static_cast<IScript*>(new Scripts::PlayerPadleControler(with_AI, with_mouce));
@@ -42,7 +42,7 @@ namespace Util {
 		GameObject* RightPadle = new GameObject{ "right_padle", {Globals::screen_width - 30.0f, Globals::screen_height / 2.0f}, false };
 		{
 			RectRenderer* renderer = new RectRenderer({ 10,100 }, {}, Color::WHITE, Core::Player);
-			Collider* col = new Collider{ {10,104},{}, PreBuild::PongPadleCollision };
+			Collider* col = new Collider{ {10,104},{}, Scripts::PongPadleCollision };
 
 			RightPadle->initializeWithComponent(*renderer);
 			RightPadle->initializeWithComponent(*col); 
@@ -70,8 +70,8 @@ namespace Util {
 		// Creating the game controller
 		GameObject* gameControler = new GameObject("GameControler", {});
 		{
-			auto left_trigger = new Trigger({ 100, 1000 }, { -50, Globals::screen_height / 2.0f }, "left_trigger");
-			auto right_trigger = new Trigger({ 100, 1000 }, { Globals::screen_width + 49.0f, Globals::screen_height / 2.0f }, "right_trigger");
+			auto left_trigger = new Trigger({ 1000, 100000 }, { -500 + -250, Globals::screen_height / 2.0f }, "left_trigger");
+			auto right_trigger = new Trigger({ 1000, 100000 }, { Globals::screen_width + 499.0f + 250, Globals::screen_height / 2.0f }, "right_trigger");
 
 			gameControler->initializeWithComponent(*new Scripts::PongController(*ball, *left_trigger, *right_trigger, *leftPadle, *RightPadle, with_AI));
 

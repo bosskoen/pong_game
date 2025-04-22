@@ -185,7 +185,7 @@ void Core::Collider::doCollision(IAABB& other, float overlap_x, float overlap_y)
 void Core::Collider::setColliderBehaviour(void(*a_behaviour)(IAABB&, IAABB&, ColDir , float)) { this->behaviour = a_behaviour; }
 
 #ifdef _DEBUG
-void Core::IAABB::draw_outline(Tmpl8::Surface& screen)
+void Core::IAABB::draw_outline(Tmpl8::Surface& screen) const 
 {
 	float x = gameobject->pos.x + ofset.x, y = gameobject->pos.y + ofset.y;
 	screen.Box(static_cast<int>(x - size.x / 2), static_cast<int>(y - size.y / 2),

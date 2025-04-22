@@ -10,7 +10,7 @@ namespace Core{
 
 	enum Label {
 		nothing,
-
+		Score_Trigger,
 	};
 
 	class GameObject

@@ -40,6 +40,45 @@ Surface& Surface::operator=(Surface&& other) noexcept {
 	return *this;
 }
 
+Surface& Surface::operator=(const Surface& other)
+{
+	if (this != &other) { // Prevent self-assignment
+		if (m_Flags & OWNER) {
+			FREE64(m_Buffer); // Free old memory
+		}
+		// Move resources
+		m_Buffer = new Pixel[other.m_Width * other.m_Height];
+		std::memcpy(m_Buffer, other.m_Buffer, other.m_Width * other.m_Height);
+		m_Width = other.m_Width;
+		m_Height = other.m_Height;
+		m_Pitch = other.m_Pitch;
+		m_Flags = other.m_Flags;
+	}
+	return *this;
+}
+
+Surface::Surface(Surface&& other) noexcept
+{
+	m_Buffer = other.m_Buffer;
+	m_Width = other.m_Width;
+	m_Height = other.m_Height;
+	m_Pitch = other.m_Pitch;
+	m_Flags = other.m_Flags;
+
+	other.m_Buffer = nullptr;
+	other.m_Flags = 0;
+}
+
+Surface::Surface(const Surface& other)
+{
+	m_Buffer = new Pixel[other.m_Width * other.m_Height];
+	std::memcpy(m_Buffer, other.m_Buffer, other.m_Width * other.m_Height);
+	m_Width = other.m_Width;
+	m_Height = other.m_Height;
+	m_Pitch = other.m_Pitch;
+	m_Flags = other.m_Flags;
+}
+
 Surface::Surface( int a_Width, int a_Height, Pixel* a_Buffer, int a_Pitch ) :
 	m_Buffer( a_Buffer ),
 	m_Width( a_Width ),
@@ -70,6 +109,7 @@ Surface::Surface(const char* a_File )
 	else fclose( f );
 	LoadImage( a_File );
 }
+
 
 void Surface::LoadImage(const char* a_File )
 {

@@ -5,7 +5,7 @@
 #include "game.h"
 
 using std::vector;
-using Util::Option;
+using Util::Option; using Util::RefCell;
 
 namespace Core{
 	class ObjectManager
@@ -68,6 +68,7 @@ namespace Core{
 		static void queueGameObjectForRemoval(GameObject& existing_object);
 
 		static Option<GameObject&> get_gameObject(const std::string& name);
+		static vector<RefCell<GameObject>> get_object_by_label(const Label lable);
 
 		friend class GameObject;
 		friend void Tmpl8::Game::Tick(float);

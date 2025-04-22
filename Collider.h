@@ -3,12 +3,14 @@
 
 #include "ColBehavior.h"
 
+#include "Cloning.h"
+
 using namespace Tmpl8;
 
 namespace Core{
 	class GameObject;
 
-	class Trigger : public virtual IAABB{
+	class Trigger : public virtual Util::Cloneable<Trigger, IAABB>{
 	private:
 		
 		enum State { ENTER, EXIT, STAY , FROREMOVAL};
@@ -40,7 +42,7 @@ namespace Core{
 		
 	};
 
-	class Collider : public virtual IAABB {
+	class Collider : public virtual Util::Cloneable<Collider, IAABB> {
 	private:
 
 		void (*behaviour)(IAABB&, IAABB& ,ColDir , float) { &PreBuild::DefaultCollision };

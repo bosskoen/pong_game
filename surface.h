@@ -42,6 +42,8 @@ public:
 	Surface( int a_Width, int a_Height, Pixel* a_Buffer, int a_Pitch );
 	Surface( int a_Width, int a_Height );
 	Surface(const char* a_File );
+	Surface(Surface&& other) noexcept;
+	Surface(const Surface& other);
 	~Surface();
 	// member data access
 	Pixel* GetBuffer()const { return m_Buffer; }
@@ -68,6 +70,7 @@ public:
 	void Resize( Surface* a_Orig );
 
 	Surface& Surface::operator=(Surface&& other) noexcept;
+	Surface& Surface::operator=(const Surface& other);
 private:
 	// Attributes
 	Pixel* m_Buffer{nullptr};	

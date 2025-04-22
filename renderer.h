@@ -3,6 +3,7 @@
 
 #include "Color.h"
 #include "ResourceManager.h"
+#include "Cloning.h"
 
 using namespace Tmpl8;
 using namespace Util;
@@ -10,7 +11,7 @@ using std::string;
 
 namespace Core {
 
-	class RectRenderer : public virtual IRenderer {
+	class RectRenderer : public virtual Cloneable<RectRenderer, IRenderer>{
 		Color color {Color()};
 	public:
 		vec2 size;
@@ -20,7 +21,7 @@ namespace Core {
 		void update_color(Color a_color);
 	};
 
-	class BoxRenderer : public virtual IRenderer {
+	class BoxRenderer : public virtual Cloneable<BoxRenderer, IRenderer> {
 		vec2 size;
 		int with{ 0 };
 		Color color{ Color() };
@@ -44,7 +45,7 @@ namespace Core {
 		BOTTEMRIGHT,
 	};
 
-	class TextRenderer : public virtual IRenderer{
+	class TextRenderer : public virtual Cloneable<TextRenderer, IRenderer> {
 	public:
 
 		TextRenderer() = default;
@@ -67,7 +68,7 @@ namespace Core {
 		bool need_update{ true };
 	};
 
-	class SpriteRenderer : public virtual IRenderer {
+	class SpriteRenderer : public virtual IRenderer,public virtual ICloneable<IRenderer> {
 	public:
 		SpriteRenderer() = default;
 		SpriteRenderer(vec2int a_frame_count, vec2int frame, vec2 a_ofset, const string& sprite_map, RenderLayer a_layer, bool a_active = true);
@@ -80,6 +81,8 @@ namespace Core {
 		vec2int frame_count { vec2int() };
 		vec2int current_frame{ vec2int() };
 		int start_in_buffer{ 0 };
+
+		MAKE_CLONEABLE(SpriteRenderer, IRenderer);
 	};
 
 }
