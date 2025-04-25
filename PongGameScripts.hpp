@@ -119,6 +119,7 @@ namespace Scripts {
 				mis_incr = 5;
 				break;
 			}
+			first_frame = true;
 		}
 	public:
 		float speed = 0;
@@ -175,8 +176,6 @@ namespace Scripts {
 			}
 
 			mis_chance += mis_incr;
-
-			fmt::println("miss change {}", mis_chance);
 
 			float finalY = targetY + offset;
 
